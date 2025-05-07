@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperSwitch - Reorder Inserts</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+             <!-- Nav links will be dynamically updated by JS -->
+        </nav>
+         <div class="logo-container">
+        <h1>PaperSwitch</h1>
+    </header>
+
+    <main>
+        <h2>Replenish Your Pages</h2>
+        <p>Already own a PaperSwitch? Order fresh inserts anytime.</p>
+
+        <form id="reorder-form">
+            <h3>Standard Inserts:</h3>
+            <div class="standard-inserts">
+                <label>
+                    <input type="checkbox" name="insert" value="lined"> Lined
+                </label>
+                <br>
+                <label>
+                    <input type="checkbox" name="insert" value="graph"> Graph
+                </label>
+                <br>
+                <label>
+                    <input type="checkbox" name="insert" value="blank"> Blank
+                </label>
+            </div>
+
+            <!-- Section for Logged-in Users -->
+            <div id="custom-inserts-section" style="display: none; margin-top: 30px;">
+                <hr>
+                <h3>Your Saved Page Designs:</h3>
+                <div id="custom-inserts-list">
+                    <!-- Saved designs will be loaded here -->
+                    <p>Loading your designs...</p>
+                    <!-- Example:
+                    <label>
+                        <input type="checkbox" name="custom-insert" value='{"style":"dotted","color":"#abcdef"}'> Dotted, #abcdef
+                    </label>
+                    -->
+                </div>
+            </div>
+
+            <br><br>
+            <!-- Add quantity selectors if needed -->
+            <button type="submit" class="button">Add Selected to Cart</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PaperSwitch. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

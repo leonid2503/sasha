@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperSwitch - Shopping Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+             <!-- Nav links will be dynamically updated by JS -->
+        </nav>
+         <div class="logo-container">
+            <h1>PaperSwitch</h1>
+        </div>
+    </header>
+
+    <main>
+        <h2>Your Shopping Cart</h2>
+
+        <div id="cart-items">
+            <!-- Cart items will be loaded here dynamically -->
+            <p>Your cart is currently empty.</p>
+            <!-- Example Item Structure:
+            <div class="cart-item">
+                <span>Custom Notebook (Lined, Blue)</span>
+                <span>$19.99</span>
+                <button>Remove</button>
+            </div>
+            -->
+        </div>
+
+        <div id="cart-summary" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: right;">
+            <h4>Cart Total: $<span id="cart-total">0.00</span></h4>
+            <a href="checkout.html" class="button" id="checkout-btn" style="display: none;">Proceed to Checkout</a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PaperSwitch. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <!-- Add specific cart logic script if needed -->
+</body>
+</html> 

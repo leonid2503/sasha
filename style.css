@@ -1,0 +1,735 @@
+:root {
+    --primary-color: #6a0dad; /* Purple */
+    --secondary-color: #9370db; /* Medium Purple */
+    --light-purple: #e6e6fa; /* Lavender */
+    --dark-purple: #4b0082; /* Indigo */
+    --text-color: #333;
+    --light-text: #fff;
+    --border-color: #ddd;
+    --light-bg: #f9f9f9;
+    --hover-bg: #eee;
+    --disabled-bg: #cccccc;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #fff; /* White background */
+    padding-top: 80px; /* Space for fixed header */
+}
+
+header {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 1rem 0;
+    text-align: center;
+    position: fixed; /* Fixed header */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 10px 0 0 0;
+    margin: 0;
+    box-shadow: var(--shadow);
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--light-purple);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav a:hover, nav a.active {
+    color: var(--light-text);
+    text-decoration: none;
+}
+
+main {
+    max-width: 1100px; /* Wider max-width */
+    margin: 40px auto; /* More space from header */
+    padding: 30px;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+main h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.8rem;
+}
+
+main h3 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    border-bottom: 2px solid var(--light-purple);
+    padding-bottom: 5px;
+}
+
+main h4 {
+    color: var(--dark-purple);
+    margin-bottom: 10px;
+}
+
+.button, button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 5px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.button:hover, button:hover:not(:disabled) {
+    background-color: var(--dark-purple);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.button:disabled, button:disabled {
+    background-color: var(--disabled-bg);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.cta-buttons {
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* Forms */
+form {
+    margin-top: 20px;
+    min-height: 100px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--secondary-color);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="file"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    margin-right: 8px;
+}
+
+input[type="range"] {
+    width: 80%;
+    cursor: pointer;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Build Page Specific */
+.section-options, .current-mix, .constructor-link, .notebook-config {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid var(--light-purple);
+    border-radius: 5px;
+    background-color: var(--light-bg);
+}
+
+.section-cards {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.card {
+    border: 2px solid transparent; /* Start transparent for selection effect */
+    padding: 15px;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    min-width: 100px;
+}
+
+.card:hover {
+    background-color: var(--hover-bg);
+    transform: translateY(-2px);
+}
+
+.card.selected {
+    border-color: var(--secondary-color);
+    background-color: var(--light-purple);
+}
+
+#mix-container {
+    min-height: 60px;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#mix-container div {
+    padding: 5px 0;
+    border-bottom: 1px dotted var(--light-purple);
+}
+#mix-container div:last-child {
+    border-bottom: none;
+}
+
+/* Constructor Page Specific */
+.constructor-main {
+    max-width: 1200px;
+    position: relative; /* Needed if using absolute positioning for window */
+}
+
+/* Floating Preview Window Styles */
+.floating-window {
+    position: fixed; /* Float over everything, stay in viewport */
+    right: 20px;     /* Initial position */
+    top: 100px;    /* Initial position (below header) */
+    width: 50%;    /* Initial size */
+    max-width: 700px;
+    min-width: 350px;
+    z-index: 1001; /* Above header */
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: auto;     /* Allow scrolling if content overflows, needed for resize handle */
+    resize: both;     /* Allow user resizing (basic) */
+    min-height: 300px; /* Prevent resizing too small */
+    display: flex;
+    flex-direction: column;
+}
+
+.window-header {
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    padding: 8px 15px;
+    cursor: move; /* Indicate draggable */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.window-header span {
+    font-weight: bold;
+}
+
+.window-controls .window-btn {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 1;
+    box-shadow: none;
+}
+
+.window-controls .window-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* Adjust preview content area */
+#notebook-preview.preview-content {
+    flex-grow: 1;
+    min-height: 300px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: var(--disabled-bg);
+    border: 1px dashed var(--secondary-color);
+    border-radius: 5px;
+    position: relative;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#preview-cover-layer {
+    /* Styles set inline for toggling */
+    /* Example texture placeholders */
+}
+
+#preview-cover-layer.leather {
+    background-color: #8B4513; /* Brown */
+    /* Add texture image later */
+}
+#preview-cover-layer.wood {
+    background-color: #DEB887; /* BurlyWood */
+    /* Add texture image later */
+}
+
+/* Ensure layers are contained within the padding */
+#preview-image-layer {
+    position: absolute;
+    top: 0; /* Cover the entire parent */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    /* opacity set by JS */
+    pointer-events: none; /* Allow clicks through to page content if needed */
+}
+
+/* Style the container for page content */
+#preview-page-content {
+    width: 100%;
+    height: 100%;
+    position: relative; /* Already set inline, but good practice */
+    overflow: hidden;   /* Clip inserts/diary header if they go outside bounds */
+}
+
+/* Style the placeholder text */
+#preview-page-content > p {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--disabled-bg);
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    display: block; /* Initially visible */
+}
+
+/* Controls Pane Wrapper - takes up space on the page */
+.controls-pane-wrapper {
+    max-width: 450px; /* Adjust width as needed */
+    margin-right: auto; /* Keep controls to the left */
+    /* Or use margin: 0 auto; to center if preferred */
+}
+
+.controls-pane {
+    /* Removed flex properties as it's no longer side-by-side */
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    min-width: 280px;
+}
+
+.control-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--light-purple);
+}
+.control-group:last-of-type {
+    border-bottom: none;
+}
+
+.color-picker-wrapper label {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+input[type="color"] {
+    vertical-align: middle;
+    margin-left: 5px;
+    cursor: pointer;
+    width: 40px;
+    height: 30px;
+    border: none;
+    padding: 0;
+}
+
+/* Placeholders for Drag and Drop */
+.droppable-area {
+    border: 2px dashed var(--secondary-color);
+    min-height: 100px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: var(--disabled-bg);
+}
+
+.draggable-item {
+    padding: 8px 12px;
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    border-radius: 4px;
+    margin: 5px;
+    cursor: grab;
+    display: inline-block;
+}
+
+footer {
+    background-color: var(--dark-purple);
+    color: var(--light-purple);
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding-top: 120px; /* Adjust for potentially taller header */
+    }
+    nav ul li {
+        margin: 0 8px;
+    }
+    main {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    .constructor-interface {
+        flex-direction: column;
+    }
+    .preview-pane, .controls-pane {
+        flex: none; /* Remove flex sizing */
+        width: 100%; /* Stack vertically */
+    }
+}
+
+/* Cart Item Styling */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--light-purple);
+    padding: 15px 0;
+    margin-bottom: 10px;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.cart-item-details h4 {
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.cart-item-details ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.cart-item-price {
+    font-weight: bold;
+    color: var(--dark-purple);
+    min-width: 60px;
+    text-align: right;
+    margin-right: 15px;
+}
+
+.cart-item-remove button {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    box-shadow: none;
+}
+
+.cart-item-remove button:hover {
+    background-color: #c82333;
+}
+
+/* Homepage Specific */
+.hero-section {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: var(--light-bg);
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.notebook-photos {
+    margin: 20px 0;
+}
+
+.notebook-photos img {
+    max-width: 45%;
+    height: auto;
+    border-radius: 5px;
+    margin: 5px;
+    box-shadow: var(--shadow);
+}
+
+.feedback-display-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--light-purple);
+}
+
+.feedback-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto; /* Basic horizontal scroll for now */
+    padding: 20px;
+    /* TODO: Add animation for spinning */
+    min-height: 150px; /* Ensure space is visible */
+    align-items: center;
+    justify-content: flex-start; /* Start cards from left */
+    border: 1px solid var(--border-color);
+    background-color: var(--light-bg);
+    border-radius: 5px;
+}
+
+.feedback-card {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    min-width: 250px;
+    max-width: 300px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0; /* Prevent cards from shrinking */
+     /* Add animation properties later */
+    /* animation: spin 20s linear infinite; */
+}
+
+.feedback-card .stars {
+    color: #f8d64e; /* Gold color for stars */
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.feedback-card p {
+    font-style: italic;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.feedback-card span {
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+/* Basic Spinning Animation (Example - can be improved) */
+@keyframes spin {
+    from { transform: translateX(0); }
+    /* Move cards - adjust based on number/width */
+    to { transform: translateX(-800px); } 
+}
+
+/* Star Rating Input */
+.star-rating {
+    display: inline-block;
+    direction: rtl; /* Right to left to make hover/selection work nicely */
+    font-size: 2em; /* Adjust size */
+    margin-bottom: 10px;
+}
+.star-rating input[type=radio] {
+    display: none;
+}
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    display: inline-block; /* Reset display */
+    padding: 0 0.1em;
+    transition: color 0.2s ease-in-out;
+    margin: 0;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label, /* Color preceding stars on hover */
+.star-rating input[type=radio]:checked ~ label /* Color selected and preceding stars */
+{
+    color: #f8d64e; /* Gold */
+}
+
+/* View Toggle Buttons */
+.view-toggle-btn {
+    background: none;
+    border: 1px solid transparent;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
+.view-toggle-btn.active {
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    font-weight: bold;
+}
+
+.view-toggle-btn:not(.active):hover {
+    background-color: #ddd;
+}
+
+/* Auth Forms */
+.auth-form {
+    max-width: 450px;
+    margin: 30px auto;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--light-bg);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+/* Profile Page */
+#profile-info {
+    margin-bottom: 20px;
+}
+
+#profile-info p {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+#profile-info strong {
+    color: var(--primary-color);
+}
+
+#saved-designs-list {
+    margin-top: 20px;
+}
+
+.saved-design-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--light-purple);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.saved-design-item span.design-details {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.saved-design-item span small {
+     display: block;
+     color: #666;
+     margin-top: 3px;
+}
+
+.saved-design-item .design-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.saved-design-item .design-actions button {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+.saved-design-item .design-actions .edit-name-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.2em; /* Make icon slightly larger */
+    padding: 0 5px;
+    box-shadow: none;
+}
+
+.saved-design-item .design-actions .edit-name-btn:hover {
+    color: var(--primary-color);
+}

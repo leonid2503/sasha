@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperSwitch - Build Your Notebook</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+             <!-- Nav links will be dynamically updated by JS -->
+        </nav>
+        <h1>PaperSwitch</h1>
+    </header>
+
+    <main>
+        <h2>Design Your Perfect Notebook</h2>
+        <p>Select from pre-built sections or launch the Constructor to fine-tune every detail.</p>
+
+        <div class="notebook-config">
+             <h3>1. Choose Size:</h3>
+             <div id="size-options">
+                 <label>
+                     <input type="radio" name="notebook-size" value="48" data-price="10" required>
+                     48 Pages (£10 base)
+                 </label>
+                 <label>
+                     <input type="radio" name="notebook-size" value="96" data-price="15" required>
+                     96 Pages (£15 base)
+                 </label>
+             </div>
+        </div>
+
+        <div class="section-options" id="section-options-container" style="opacity: 0.5; pointer-events: none;">
+            <h3>2. Add Pre-built Sections (Optional):</h3>
+            <div class="section-cards">
+                <!-- Thumbnails will be added dynamically or statically here -->
+                <div class="card" data-section-type="lined">Lined</div>
+                <div class="card" data-section-type="graph">Graph</div>
+                <div class="card" data-section-type="blank">Blank</div>
+                <div class="card" data-section-type="stickers">Stickers</div>
+                <div class="card" data-section-type="file-pocket">File Pocket</div>
+                <div class="card" data-section-type="agenda">Agenda</div>
+            </div>
+            <button id="add-section-btn">Add Section</button> <!-- Functionality TBD -->
+        </div>
+
+        <div class="current-mix">
+            <h3>Your Current Notebook Mix:</h3>
+            <div id="mix-container">
+                <!-- Added sections will appear here -->
+            </div>
+            <button id="remove-section-btn">Remove Last Section</button> <!-- Functionality TBD -->
+        </div>
+
+        <div class="constructor-link" id="constructor-link-container" style="opacity: 0.5; pointer-events: none;">
+             <h3>3. Customize Further (Optional):</h3>
+            <a href="constructor.html" class="button" id="open-constructor-btn">Open Constructor</a>
+        </div>
+
+        <div class="cta-buttons">
+            <button id="add-mix-to-cart-btn" class="button" disabled>Add Mix to Cart</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PaperSwitch. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

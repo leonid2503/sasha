@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperSwitch - Constructor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+             <!-- Nav links will be dynamically updated by JS -->
+        </nav>
+        <h1>PaperSwitch</h1>
+    </header>
+
+    <main class="constructor-main">
+        <h2>Play as the Constructor</h2>
+
+        <!-- Preview Pane moved outside the main interface flow -->
+        <div class="preview-pane floating-window" id="floating-preview-window">
+             <div class="window-header" id="preview-window-header">
+                 <span>Live Preview</span>
+                 <div class="window-controls">
+                     <button class="window-btn" id="preview-minimize">_</button>
+                     <button class="window-btn" id="preview-maximize">□</button>
+                     <!-- <button class="window-btn" id="preview-close">X</button> -->
+                 </div>
+             </div>
+            <!-- View Toggle Buttons -->
+            <div class="view-toggle" style="padding: 5px 10px; text-align: center; border-bottom: 1px solid var(--border-color); background: #eee;">
+                <button id="view-page-btn" class="view-toggle-btn active">Page Design</button>
+                <button id="view-cover-btn" class="view-toggle-btn">Cover Design</button>
+            </div>
+
+            <div id="notebook-preview" class="preview-content">
+                 <!-- Cover Layer (initially hidden or shown based on view) -->
+                 <div id="preview-cover-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #ccc; background-size: cover; background-position: center; display: none; /* Initially hidden */">
+                     <!-- Cover content/image will be applied here -->
+                     <p style="text-align: center; padding: 20px; color: #555;">Cover Preview</p>
+                 </div>
+                <!-- Page Layers (initially shown) -->
+                <div id="preview-page-content" style="width: 100%; height: 100%; position: relative;">
+                    <p>Your design will appear here</p>
+                    <div id="preview-image-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 1;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls pane remains -->
+        <div class="controls-pane-wrapper">
+            <div class="controls-pane">
+                <h3>Controls</h3>
+
+                <!-- Page Controls Group -->
+                <div id="page-controls-group">
+                    <div class="control-group" id="color-controls">
+                        <h4>Page Colour</h4>
+                         <div class="color-picker-wrapper">
+                            <label for="page-color">Section Color:</label>
+                            <input type="color" id="page-color" value="#ffffff"> <!-- Default white -->
+                         </div>
+                         <p style="font-size: 0.8em; margin-top: 5px;">(Note: Per-section colours require section data)</p>
+                    </div>
+                    <div class="control-group" id="style-controls">
+                        <h4>Page Style</h4>
+                        <div>
+                            <input type="radio" id="style-lined" name="page-style" value="lined" checked>
+                            <label for="style-lined">Lined</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="style-grid" name="page-style" value="grid">
+                            <label for="style-grid">Grid</label>
+                        </div>
+                         <div>
+                            <input type="radio" id="style-dotted" name="page-style" value="dotted">
+                            <label for="style-dotted">Dotted</label>
+                        </div>
+                         <div>
+                            <input type="radio" id="style-blank" name="page-style" value="blank">
+                            <label for="style-blank">Blank</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="style-diary" name="page-style" value="diary">
+                            <label for="style-diary">Diary</label>
+                        </div>
+                        <hr style="margin: 15px 0;">
+                        <label for="album-toggle">
+                            <input type="checkbox" id="album-toggle">
+                            Album View (Horizontal)
+                        </label>
+                    </div>
+                    <div class="control-group" id="image-controls">
+                        <h4>Custom Image (Cover/Page Background)</h4>
+                        <label for="image-upload">Upload Image:</label>
+                        <input type="file" id="image-upload" accept="image/*">
+                        <label for="opacity-slider">Image Opacity:</label>
+                        <input type="range" id="opacity-slider" min="0" max="1" step="0.05" value="1">
+                        <span id="opacity-value">1.0</span>
+                    </div>
+                    <div class="control-group" id="insert-controls">
+                        <h4>Page Stickers & Inserts (Drag to Preview)</h4>
+                         <div id="draggable-items-source">
+                            <div class="draggable-item" draggable="true" data-item-type="sticker1">Sticker A</div>
+                            <div class="draggable-item" draggable="true" data-item-type="sticker2">Sticker B</div>
+                            <div class="draggable-item" draggable="true" data-item-type="agenda-insert">Agenda Insert</div>
+                             <!-- Add more draggable items -->
+                         </div>
+                         <p style="font-size: 0.8em; margin-top: 10px;">(Drag & Drop functionality is basic)</p>
+                        <!-- <div id="preview-drop-area" class="droppable-area">Drop Area in Preview (concept)</div> -->
+                    </div>
+                </div>
+
+                <!-- Cover Controls Group (initially hidden) -->
+                <div id="cover-controls-group" style="display: none;">
+                     <div class="control-group" id="cover-material-controls">
+                        <h4>Cover Material</h4>
+                         <label>
+                             <input type="radio" name="cover-material" value="plastic" data-price="0" checked> Plastic (Standard)
+                         </label>
+                         <label>
+                             <input type="radio" name="cover-material" value="leather" data-price="5">
+                             Leather (+£5)
+                         </label>
+                         <label>
+                             <input type="radio" name="cover-material" value="wood" data-price="7">
+                             Wood (+£7)
+                         </label>
+                    </div>
+                     <div class="control-group" id="cover-image-controls">
+                        <h4>Cover Image</h4>
+                        <label for="cover-image-upload">Upload Image:</label>
+                        <input type="file" id="cover-image-upload" accept="image/*">
+                        <p style="font-size: 0.8em; margin-top: 5px;">(+£2 if image added)</p>
+                        <!-- Add opacity/other controls if needed -->
+                    </div>
+                </div>
+
+                <div class="control-group design-name-group">
+                    <h4>Design Name (Optional)</h4>
+                    <input type="text" id="design-name" placeholder="e.g., My Project Notebook">
+                </div>
+
+                <button id="submit-design-btn" class="button">Save & Add to Build</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PaperSwitch. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

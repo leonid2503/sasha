@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperSwitch - Feedback</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+             <!-- Nav links will be dynamically updated by JS -->
+        </nav>
+        <h1>PaperSwitch</h1>
+    </header>
+
+    <main>
+        <h2>Give Us Your Feedback</h2>
+        <p>We'd love to hear your comments, testimonials, or feature requests!</p>
+
+        <form id="feedback-form">
+            <label for="feedback-text">Your Feedback:</label>
+            <br>
+            <textarea id="feedback-text" name="feedback" rows="10" cols="50" required></textarea>
+            <br><br>
+
+            <label for="feedback-rating">Rating:</label>
+            <div class="star-rating">
+                <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
+                <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+                <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+                <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+                <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+            </div>
+            <br>
+
+            <button type="submit" class="button">Send Feedback</button>
+        </form>
+
+        <div class="feedback-summary" style="margin-top: 40px;">
+            <h3>Feedback Summary</h3>
+            <!-- Placeholder for Bar Chart -->
+            <div id="feedback-chart-container" style="width: 80%; max-width: 500px; height: 250px; border: 1px dashed var(--border-color); margin: 15px auto; display: flex; align-items: center; justify-content: center; color: var(--disabled-bg);">
+                <p>(Chart will be displayed here)</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PaperSwitch. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
