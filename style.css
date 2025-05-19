@@ -733,3 +733,213 @@ footer {
 .saved-design-item .design-actions .edit-name-btn:hover {
     color: var(--primary-color);
 }
+
+/* 3D Notebook Styles */
+.notebook-3d-preview {
+    perspective: 1200px;
+    perspective-origin: 50% 200px;
+}
+
+.notebook-3d {
+    width: 320px;
+    height: 420px;
+    margin: 30px auto;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(.4,2,.3,1), box-shadow 0.5s;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.notebook-3d.zoomed {
+    transform: scale(1.15) rotateY(-60deg) translateX(60px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+}
+
+.notebook-3d.open {
+    transform: scale(1.15) rotateY(-120deg) translateX(120px);
+}
+
+.notebook-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 12px 12px 12px 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 3;
+    backface-visibility: hidden;
+    transition: background-image 0.4s, background-color 0.4s;
+}
+
+.notebook-spine {
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 32px;
+    height: 100%;
+    background: linear-gradient(90deg, #bbb 60%, #888 100%);
+    border-radius: 16px 0 0 16px;
+    z-index: 2;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.10);
+}
+
+.notebook-pages {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    width: 92%;
+    height: 95%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+}
+
+.notebook-3d.open .notebook-pages {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.notebook-3d.open .notebook-cover {
+    opacity: 0.15;
+}
+
+/* Page List Builder Styles */
+.page-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    min-height: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: #f7f7f7;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.page-list li {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    margin: 2px 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: grab;
+    transition: box-shadow 0.2s;
+}
+.page-list li.dragging {
+    opacity: 0.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.page-list .page-type {
+    flex: 1;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+.page-list .remove-page-btn {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 1em;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 2px 8px;
+}
+.page-list .remove-page-btn:hover {
+    background: #b71c1c;
+}
+.add-page-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* 3D Notebook Two-Page Spread */
+.notebook-3d.spread-view {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 480px;
+    height: 320px;
+    perspective: 1200px;
+    margin: 30px auto;
+    background: #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    position: relative;
+}
+.notebook-spine {
+    width: 18px;
+    min-width: 18px;
+    height: 90%;
+    background: linear-gradient(90deg, #bbb 60%, #888 100%);
+    border-radius: 12px;
+    margin: 0 2px;
+    z-index: 2;
+}
+.spread-pages {
+    display: flex;
+    flex-direction: row;
+    width: 440px;
+    height: 95%;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+.spread-page {
+    width: 210px;
+    height: 98%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s;
+}
+.spread-page .page-label {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    font-size: 0.85em;
+    color: #888;
+    background: rgba(255,255,255,0.7);
+    padding: 1px 6px;
+    border-radius: 4px;
+    z-index: 2;
+}
+.spread-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin: 10px 0 0 0;
+}
+.spread-controls button {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2em;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.spread-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

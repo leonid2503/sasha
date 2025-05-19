@@ -178,7 +178,7 @@ function setupBuildPage() {
 
         // Display chosen size
         const sizeDiv = document.createElement('div');
-        sizeDiv.innerHTML = `<b>Size:</b> ${notebookConfig.size} Pages (£${notebookConfig.basePrice.toFixed(2)})`;
+        sizeDiv.innerHTML = `<b>Size:</b> ${notebookConfig.size} Pages (€${notebookConfig.basePrice.toFixed(2)})`;
         mixContainer.appendChild(sizeDiv);
 
         if (notebookConfig.sections.length === 0) {
@@ -200,7 +200,7 @@ function setupBuildPage() {
                 let coverDetails = `Cover: ${design.coverMaterial}`;
                 if (design.coverImage) coverDetails += ', Custom Image';
 
-                sectionDiv.innerHTML = `${index + 1}. <b>Custom Design</b> (<small>Pages: ${pageDetails} | ${coverDetails}</small>) - <i>Price: £${design.price.toFixed(2)}</i>`;
+                sectionDiv.innerHTML = `${index + 1}. <b>Custom Design</b> (<small>Pages: ${pageDetails} | ${coverDetails}</small>) - <i>Price: €${design.price.toFixed(2)}</i>`;
                 // Update total price JUST IN CASE (should be set when custom is added)
                 notebookConfig.totalPrice = design.price;
             }
@@ -209,7 +209,7 @@ function setupBuildPage() {
 
         // Display Total Price
         const totalDiv = document.createElement('div');
-        totalDiv.innerHTML = `<hr><b>Total Mix Price: £${notebookConfig.totalPrice.toFixed(2)}</b>`;
+        totalDiv.innerHTML = `<hr><b>Total Mix Price: €${notebookConfig.totalPrice.toFixed(2)}</b>`;
         totalDiv.style.fontWeight = 'bold';
         totalDiv.style.marginTop = '10px';
         mixContainer.appendChild(totalDiv);
@@ -292,458 +292,339 @@ function setupBuildPage() {
 
 function setupConstructorPage() {
     console.log('Setting up Constructor page...');
+    // --- State --- //
+    let currentDesign = {
+        coverMaterial: 'blue-plastic',
+        coverImage: null,
+        pageColor: '#ffffff',
+        name: '',
+        pages: [] // Will be built from pageList
+    };
+    let pageList = [];
+    let totalPages = 48; // Default total pages
+    let currentView = 'cover';
+    let spreadIndex = 0;
 
-    // Window elements
-    const previewWindow = document.getElementById('floating-preview-window');
-    const previewHeader = document.getElementById('preview-window-header');
-    const minimizeBtn = document.getElementById('preview-minimize');
-    const maximizeBtn = document.getElementById('preview-maximize');
-
-    // Other elements
-    const submitBtn = document.getElementById('submit-design-btn');
-    const notebookPreview = document.getElementById('notebook-preview');
-    const previewImageLayer = document.getElementById('preview-image-layer');
-    const previewStyleLayer = document.getElementById('preview-style-layer'); // Layer for lines/grids
-    const pageColorInput = document.getElementById('page-color');
-    const styleInputs = document.querySelectorAll('input[name="page-style"]');
-    const albumToggle = document.getElementById('album-toggle');
-    const imageUpload = document.getElementById('image-upload');
-    const opacitySlider = document.getElementById('opacity-slider');
-    const opacityValueSpan = document.getElementById('opacity-value');
-    const draggableItems = document.querySelectorAll('.draggable-item');
-
-    // New elements for Cover Design & View Toggle
-    const viewPageBtn = document.getElementById('view-page-btn');
+    // --- DOM Elements --- //
+    const notebook3d = document.getElementById('notebook-3d');
+    const pageListElement = document.getElementById('page-list');
+    const addPageBtn = document.getElementById('add-page-btn');
+    const addPageType = document.getElementById('add-page-type');
+    const pageCountInput = document.getElementById('page-count');
+    const totalPagesInput = document.getElementById('total-pages');
     const viewCoverBtn = document.getElementById('view-cover-btn');
-    const pageControlsGroup = document.getElementById('page-controls-group');
+    const viewPagesBtn = document.getElementById('view-pages-btn');
     const coverControlsGroup = document.getElementById('cover-controls-group');
+    const pageControlsGroup = document.getElementById('page-controls-group');
     const coverMaterialInputs = document.querySelectorAll('input[name="cover-material"]');
     const coverImageUpload = document.getElementById('cover-image-upload');
-    const previewCoverLayer = document.getElementById('preview-cover-layer');
-    const previewPageContent = document.getElementById('preview-page-content');
+    const pageColorInput = document.getElementById('page-color');
+    const designNameInput = document.getElementById('design-name');
+    const totalPriceSpan = document.getElementById('total-price');
+    const submitBtn = document.getElementById('submit-design-btn');
 
-    // --- State Variables --- //
-    let currentView = 'page'; // 'page' or 'cover'
-
-    let currentDesign = {
-        // Page design
-        color: pageColorInput.value,
-        style: document.querySelector('input[name="page-style"]:checked').value,
-        albumView: albumToggle.checked,
-        image: null, // Page image Data URL
-        imageOpacity: opacitySlider.value,
-        inserts: [],
-        // Cover design
-        coverMaterial: document.querySelector('input[name="cover-material"]:checked').value,
-        coverImage: null // Cover image Data URL
+    // --- Cover images --- //
+    const coverImages = {
+        'blue-plastic': '/images/photo_5255816145599066963_y.jpg',
+        'black-plastic': '/images/photo_5255816145599066964_y.jpg'
     };
 
-    // --- Shared state for window --- //
-    let isDragging = false;
-    let offsetX, offsetY;
-    let originalHeight = previewWindow.style.height || '50vh'; // Store original size for minimize/restore
-    let isMaximized = false;
-    let originalSize = { width: previewWindow.style.width, height: previewWindow.style.height, top: previewWindow.style.top, left: previewWindow.style.left };
-
-    // --- Get Base Config from Build Page --- //
-    const notebookSize = parseInt(localStorage.getItem('currentNotebookSize') || '0');
-    const notebookBasePrice = parseFloat(localStorage.getItem('currentNotebookBasePrice') || '0');
-
-    if (!notebookSize || !notebookBasePrice) {
-        alert('Error: Notebook size not selected. Please go back to the Build page.');
-        // Optionally disable controls or redirect
-        previewWindow.innerHTML = '<p style="color: red; padding: 20px;">Configuration Error. Please return to Build page.</p>';
-        return; // Stop setup if config is missing
-    }
-    console.log(`Constructor loaded for Size: ${notebookSize}, Base Price: £${notebookBasePrice}`);
-
-    function updatePreview() {
-        console.log('Updating preview for view:', currentView, 'with:', currentDesign);
-
-        if (currentView === 'page') {
-            // --- Show Page Content, Hide Cover --- //
-            previewCoverLayer.style.display = 'none';
-            previewPageContent.style.display = 'block';
-            notebookPreview.style.backgroundColor = 'transparent'; // Let page content handle bg
-
-            // --- Apply styles directly to previewPageContent --- //
-            previewPageContent.innerHTML = ''; // Clear previous diary header/inserts but keep image layer
-            previewPageContent.appendChild(previewImageLayer); // Ensure image layer stays
-            previewPageContent.appendChild(document.createElement('p')).textContent = 'Your design will appear here'; // Re-add placeholder if needed
-            previewPageContent.querySelector('p').style.display = 'none'; // Hide placeholder for actual content
-
-            // Update page background color
-            previewPageContent.style.backgroundColor = currentDesign.color;
-
-            // Update page image and opacity (already targets the separate layer)
-            if (currentDesign.image) {
-                previewImageLayer.style.backgroundImage = `url(${currentDesign.image})`;
-            } else {
-                previewImageLayer.style.backgroundImage = 'none';
-            }
-            previewImageLayer.style.opacity = currentDesign.imageOpacity;
-
-            // Update page style (lines, grid, etc.) applied to previewPageContent
-            previewPageContent.style.backgroundImage = 'none'; // Reset background image style
-            previewPageContent.style.backgroundSize = 'auto';   // Reset background size
-
-            if (currentDesign.style === 'lined') {
-                previewPageContent.style.backgroundImage = 'repeating-linear-gradient(to bottom, transparent, transparent 29px, #ccc 29px, #ccc 30px)';
-                previewPageContent.style.backgroundSize = '100% 30px';
-            } else if (currentDesign.style === 'grid') {
-                previewPageContent.style.backgroundImage = 'linear-gradient(#ccc 1px, transparent 1px), linear-gradient(to right, #ccc 1px, transparent 1px)';
-                previewPageContent.style.backgroundSize = '20px 20px';
-            } else if (currentDesign.style === 'dotted') {
-                previewPageContent.style.backgroundImage = 'radial-gradient(#aaa 2px, transparent 2px)';
-                previewPageContent.style.backgroundSize = '20px 20px';
-            } else if (currentDesign.style === 'diary') {
-                // Apply lined style *first*
-                previewPageContent.style.backgroundImage = 'repeating-linear-gradient(to bottom, transparent, transparent 29px, #ccc 29px, #ccc 30px)';
-                previewPageContent.style.backgroundSize = '100% 30px';
-                // Add the date header
-                const diaryHeader = document.createElement('div');
-                diaryHeader.innerHTML = 'Date: ____________________';
-                diaryHeader.style.position = 'absolute'; // Position relative to previewPageContent
-                diaryHeader.style.top = '5px';
-                diaryHeader.style.left = '10px';
-                diaryHeader.style.right = '10px';
-                diaryHeader.style.paddingBottom = '5px';
-                diaryHeader.style.borderBottom = '1px solid #ccc';
-                diaryHeader.style.fontSize = '0.9em';
-                diaryHeader.style.color = '#666';
-                previewPageContent.appendChild(diaryHeader);
-            }
-
-            // Force reflow/repaint after applying background styles
-            void previewPageContent.offsetHeight; // Reading offsetHeight triggers reflow
-
-            // Update Album View for Page
-            if (currentDesign.albumView) {
-                previewPageContent.style.aspectRatio = '16 / 9';
-                notebookPreview.style.aspectRatio = '16 / 9'; // Apply to outer container too
-                previewPageContent.querySelector('p').textContent = 'Your design (Album View)';
-            } else {
-                previewPageContent.style.aspectRatio = 'auto';
-                notebookPreview.style.aspectRatio = 'auto';
-                previewPageContent.querySelector('p').textContent = 'Your design will appear here';
-            }
-            // Show/hide placeholder based on content (optional)
-            if (currentDesign.image || currentDesign.style !== 'blank' || currentDesign.inserts.length > 0) {
-                 previewPageContent.querySelector('p').style.display = 'none';
-            } else {
-                 previewPageContent.querySelector('p').style.display = 'block';
-            }
-
-            // Render dropped inserts directly onto previewPageContent
-             currentDesign.inserts.forEach(insert => {
-                const droppedElement = document.createElement('div');
-                droppedElement.textContent = insert.type;
-                droppedElement.style.position = 'absolute';
-                droppedElement.style.left = `${insert.x}px`;
-                droppedElement.style.top = `${insert.y}px`;
-                droppedElement.style.background = 'rgba(150, 112, 219, 0.7)';
-                droppedElement.style.color = 'white';
-                droppedElement.style.padding = '2px 5px';
-                droppedElement.style.borderRadius = '3px';
-                droppedElement.style.cursor = 'move';
-                droppedElement.style.transform = 'translate(-50%, -50%)';
-                droppedElement.style.zIndex = '10'; // Ensure inserts are above background styles
-                previewPageContent.appendChild(droppedElement);
-            });
-
-        } else { // currentView === 'cover'
-            // --- Show Cover, Hide Page Content --- //
-            previewCoverLayer.style.display = 'block';
-            previewPageContent.style.display = 'none';
-            notebookPreview.style.backgroundColor = 'transparent'; // Let cover layer handle bg
-            notebookPreview.style.aspectRatio = 'auto'; // Cover usually portrait
-
-            // Update cover material style
-            previewCoverLayer.classList.remove('leather', 'wood'); // Remove old classes
-            previewCoverLayer.style.backgroundColor = '#ccc'; // Default plastic look
-             if (currentDesign.coverMaterial === 'leather') {
-                 previewCoverLayer.classList.add('leather');
-             } else if (currentDesign.coverMaterial === 'wood') {
-                 previewCoverLayer.classList.add('wood');
-             }
-
-            // Update cover image
-            if (currentDesign.coverImage) {
-                previewCoverLayer.style.backgroundImage = `url(${currentDesign.coverImage})`;
-                 previewCoverLayer.style.backgroundColor = 'transparent'; // Hide bg color if image exists
-            } else {
-                previewCoverLayer.style.backgroundImage = 'none';
-                // Restore background color if needed based on material
-                if (currentDesign.coverMaterial === 'leather') previewCoverLayer.style.backgroundColor = '#8B4513';
-                else if (currentDesign.coverMaterial === 'wood') previewCoverLayer.style.backgroundColor = '#DEB887';
-                else previewCoverLayer.style.backgroundColor = '#ccc';
-
-            }
-        }
-    }
-
     // --- Event Listeners --- //
-
-    // View Toggle
-    viewPageBtn.addEventListener('click', () => {
-        currentView = 'page';
-        viewPageBtn.classList.add('active');
-        viewCoverBtn.classList.remove('active');
-        pageControlsGroup.style.display = 'block';
-        coverControlsGroup.style.display = 'none';
-        updatePreview();
-    });
-    viewCoverBtn.addEventListener('click', () => {
-        currentView = 'cover';
-        viewCoverBtn.classList.add('active');
-        viewPageBtn.classList.remove('active');
-        pageControlsGroup.style.display = 'none';
-        coverControlsGroup.style.display = 'block';
-        updatePreview();
+    totalPagesInput.addEventListener('change', () => {
+        totalPages = parseInt(totalPagesInput.value);
+        enforceTotalPages();
+        updatePriceDisplay();
     });
 
-    // --- Page Controls Listeners --- //
-    pageColorInput.addEventListener('input', (e) => {
-        currentDesign.color = e.target.value;
-        updatePreview();
+    addPageBtn.addEventListener('click', () => {
+        const type = addPageType.value;
+        const count = parseInt(pageCountInput.value);
+        if (count < 1) {
+            alert('Please enter a valid number of pages (minimum 1)');
+            return;
+        }
+        const currentTotal = pageList.reduce((sum, page) => sum + page.count, 0);
+        if (currentTotal + count > totalPages) {
+            alert(`Cannot add ${count} pages. Total pages would exceed ${totalPages}.`);
+            return;
+        }
+        pageList.push({ type, count });
+        updateCurrentDesignPages();
+        renderPageList();
+        renderNotebook();
+        updatePriceDisplay();
     });
 
-    styleInputs.forEach(input => {
-        input.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                currentDesign.style = e.target.value;
-                updatePreview();
+    function updateCurrentDesignPages() {
+        // Flatten pageList into an array of page objects for preview
+        currentDesign.pages = [];
+        pageList.forEach(page => {
+            for (let i = 0; i < page.count; i++) {
+                currentDesign.pages.push({ type: page.type });
             }
         });
-    });
+    }
 
-    albumToggle.addEventListener('change', (e) => {
-        currentDesign.albumView = e.target.checked;
-        updatePreview();
-    });
+    function renderPageList() {
+        pageListElement.innerHTML = '';
+        pageList.forEach((page, index) => {
+            const li = document.createElement('li');
+            li.draggable = true;
+            li.dataset.index = index;
+            const pageInfo = document.createElement('span');
+            pageInfo.textContent = `${capitalize(page.type)} (${page.count} pages)`;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '×';
+            deleteBtn.className = 'delete-page-btn';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                pageList.splice(index, 1);
+                updateCurrentDesignPages();
+                renderPageList();
+                renderNotebook();
+                updatePriceDisplay();
+            };
+            li.appendChild(pageInfo);
+            li.appendChild(deleteBtn);
+            pageListElement.appendChild(li);
+        });
+        setupDragAndDrop();
+    }
 
-    opacitySlider.addEventListener('input', (e) => {
-        currentDesign.imageOpacity = e.target.value;
-        opacityValueSpan.textContent = parseFloat(e.target.value).toFixed(2);
-        updatePreview();
-    });
-
-    imageUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                currentDesign.image = event.target.result;
-                updatePreview();
-            }
-            reader.readAsDataURL(file);
-            console.log('Image selected:', file.name);
-        } else {
-            currentDesign.image = null;
-            updatePreview();
+    function setupDragAndDrop() {
+        const items = pageListElement.getElementsByTagName('li');
+        Array.from(items).forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+    }
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.dataset.index);
+        e.target.classList.add('dragging');
+    }
+    function handleDragOver(e) { e.preventDefault(); }
+    function handleDrop(e) {
+        e.preventDefault();
+        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+        const toIndex = parseInt(e.target.closest('li').dataset.index);
+        if (fromIndex !== toIndex) {
+            const [movedItem] = pageList.splice(fromIndex, 1);
+            pageList.splice(toIndex, 0, movedItem);
+            updateCurrentDesignPages();
+            renderPageList();
+            renderNotebook();
         }
-    });
+    }
+    function handleDragEnd(e) { e.target.classList.remove('dragging'); }
 
-    // --- Cover Controls Listeners --- //
+    function enforceTotalPages() {
+        const currentTotal = pageList.reduce((sum, page) => sum + page.count, 0);
+        if (currentTotal > totalPages) {
+            // Remove excess pages from the end
+            let remaining = totalPages;
+            pageList = pageList.filter(page => {
+                if (remaining >= page.count) {
+                    remaining -= page.count;
+                    return true;
+                }
+                return false;
+            });
+            updateCurrentDesignPages();
+            renderPageList();
+            renderNotebook();
+            updatePriceDisplay();
+        }
+    }
+
+    // --- Cover/Color Controls --- //
     coverMaterialInputs.forEach(input => {
         input.addEventListener('change', (e) => {
             if (e.target.checked) {
                 currentDesign.coverMaterial = e.target.value;
-                updatePreview();
+                renderNotebook();
             }
         });
     });
-
     coverImageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 currentDesign.coverImage = event.target.result;
-                updatePreview(); // Update preview immediately
+                renderNotebook();
             }
             reader.readAsDataURL(file);
-            console.log('Cover image selected:', file.name);
         } else {
             currentDesign.coverImage = null;
-            updatePreview(); // Update preview immediately
+            renderNotebook();
         }
     });
+    pageColorInput.addEventListener('input', (e) => {
+        currentDesign.pageColor = e.target.value;
+        renderNotebook();
+    });
+    designNameInput.addEventListener('input', (e) => {
+        currentDesign.name = e.target.value;
+    });
 
-    // --- Basic Drag and Drop --- //
-    draggableItems.forEach(item => {
-        item.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', e.target.dataset.itemType);
-            e.target.style.opacity = '0.5';
-            console.log('Dragging:', e.target.dataset.itemType);
+    // --- View Toggle --- //
+    viewCoverBtn.addEventListener('click', () => {
+        currentView = 'cover';
+        viewCoverBtn.classList.add('active');
+        viewPagesBtn.classList.remove('active');
+        coverControlsGroup.style.display = 'block';
+        pageControlsGroup.style.display = 'none';
+        renderNotebook();
+    });
+    viewPagesBtn.addEventListener('click', () => {
+        currentView = 'pages';
+        viewPagesBtn.classList.add('active');
+        viewCoverBtn.classList.remove('active');
+        coverControlsGroup.style.display = 'none';
+        pageControlsGroup.style.display = 'block';
+        renderNotebook();
+    });
+
+    // --- 3D Notebook Two-Page Spread --- //
+    function renderNotebook() {
+        notebook3d.className = 'notebook-3d spread-view';
+        notebook3d.innerHTML = '';
+        if (currentView === 'cover') {
+            const coverDiv = document.createElement('div');
+            coverDiv.className = 'notebook-cover';
+            let coverBg = coverImages[currentDesign.coverMaterial] || coverImages['blue-plastic'];
+            if (currentDesign.coverImage) {
+                coverDiv.style.backgroundImage = `url(${currentDesign.coverImage})`;
+            } else {
+                coverDiv.style.backgroundImage = `url(${coverBg})`;
+            }
+            coverDiv.style.width = '440px';
+            coverDiv.style.height = '95%';
+            coverDiv.style.margin = 'auto';
+            coverDiv.style.borderRadius = '12px';
+            coverDiv.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+            notebook3d.appendChild(coverDiv);
+            return;
+        }
+        // Page spread view
+        const spread = document.createElement('div');
+        spread.className = 'spread-pages';
+        // Left and right page indices
+        const leftIdx = spreadIndex;
+        const rightIdx = spreadIndex + 1;
+        // Left page
+        spread.appendChild(renderSpreadPage(leftIdx, 'Left'));
+        // Spine
+        const spine = document.createElement('div');
+        spine.className = 'notebook-spine';
+        spread.appendChild(spine);
+        // Right page
+        spread.appendChild(renderSpreadPage(rightIdx, 'Right'));
+        notebook3d.appendChild(spread);
+        // Controls
+        const controls = document.createElement('div');
+        controls.className = 'spread-controls';
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '⟨';
+        prevBtn.disabled = spreadIndex <= 0;
+        prevBtn.addEventListener('click', () => {
+            if (spreadIndex > 0) {
+                spreadIndex -= 2;
+                if (spreadIndex < 0) spreadIndex = 0;
+                renderNotebook();
+            }
         });
-
-        item.addEventListener('dragend', (e) => {
-            e.target.style.opacity = '1';
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '⟩';
+        nextBtn.disabled = spreadIndex + 2 >= currentDesign.pages.length;
+        nextBtn.addEventListener('click', () => {
+            if (spreadIndex + 2 < currentDesign.pages.length) {
+                spreadIndex += 2;
+                renderNotebook();
+            }
         });
-    });
-
-    notebookPreview.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Necessary to allow dropping
-        notebookPreview.style.border = '2px dashed var(--primary-color)'; // Indicate drop target
-    });
-
-     notebookPreview.addEventListener('dragleave', (e) => {
-        notebookPreview.style.border = '1px dashed var(--secondary-color)'; // Revert border
-    });
-
-    notebookPreview.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const itemType = e.dataTransfer.getData('text/plain');
-        notebookPreview.style.border = '1px dashed var(--secondary-color)'; // Revert border
-        console.log('Dropped:', itemType);
-
-        // Get drop coordinates relative to the preview area
-        const rect = notebookPreview.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Add item to design data (basic)
-        currentDesign.inserts.push({ type: itemType, x, y });
-
-        // TODO: Visually add the dropped element to the previewStyleLayer or another layer
-        // Example: create a div, position it using x, y, and append it.
-        const droppedElement = document.createElement('div');
-        droppedElement.textContent = itemType;
-        droppedElement.style.position = 'absolute';
-        droppedElement.style.left = `${x}px`;
-        droppedElement.style.top = `${y}px`;
-        droppedElement.style.background = 'rgba(150, 112, 219, 0.7)'; // Semi-transparent purple
-        droppedElement.style.color = 'white';
-        droppedElement.style.padding = '2px 5px';
-        droppedElement.style.borderRadius = '3px';
-        droppedElement.style.cursor = 'move'; // Indicate it might be movable later
-        droppedElement.style.transform = 'translate(-50%, -50%)'; // Center on drop point
-        previewStyleLayer.appendChild(droppedElement);
-
-        updatePreview(); // Re-render if needed, or just log current design
-        console.log("Current design with inserts:", currentDesign);
-    });
-
-    // --- Submit --- //
-    submitBtn.addEventListener('click', () => {
-        // Calculate final price based on current design and base price
-        const finalPrice = calculatePrice(currentDesign, notebookBasePrice);
-        const designName = document.getElementById('design-name').value.trim();
-
-        // Gather final design data, including size and calculated price
-        const finalDesignData = {
-            ...currentDesign,
-            name: designName || `Custom Design ${new Date().toLocaleTimeString()}`, // Add name, default if empty
-            size: notebookSize,
-            price: finalPrice
-        };
-
-        console.log('Saving Final Design:', finalDesignData);
-        localStorage.setItem('pendingCustomDesign', JSON.stringify(finalDesignData));
-        window.location.href = 'build.html'; // Navigate back
-    });
-
-    // Initial preview render
-    updatePreview();
-
-    // --- Floating Window Logic --- //
-
-    // --- Dragging Logic --- //
-    function onDragStart(e) {
-        // Prevent dragging from buttons or resize handle
-        if (e.target.classList.contains('window-btn') || getComputedStyle(e.target).cursor === 'nwse-resize') return;
-        console.log("Drag Start Fired"); // DEBUG
-
-        isDragging = true;
-        offsetX = e.clientX - previewWindow.offsetLeft;
-        offsetY = e.clientY - previewWindow.offsetTop;
-        previewWindow.style.cursor = 'grabbing';
-        previewWindow.style.userSelect = 'none';
-
-        // Add move/up listeners to the document *only* when dragging starts
-        document.addEventListener('mousemove', onDragging);
-        document.addEventListener('mouseup', onDragEnd);
+        controls.appendChild(prevBtn);
+        controls.appendChild(nextBtn);
+        notebook3d.appendChild(controls);
     }
-
-    function onDragging(e) {
-        if (!isDragging) return;
-        console.log("Dragging..."); // DEBUG
-
-        let newX = e.clientX - offsetX;
-        let newY = e.clientY - offsetY;
-
-        // Constrain window within viewport boundaries
-        const PADDING = 10; // Prevent dragging fully off-screen
-        newX = Math.max(PADDING, Math.min(newX, window.innerWidth - previewWindow.offsetWidth - PADDING));
-        newY = Math.max(PADDING, Math.min(newY, window.innerHeight - previewWindow.offsetHeight - PADDING));
-
-        previewWindow.style.left = `${newX}px`;
-        previewWindow.style.top = `${newY}px`;
-    }
-
-    function onDragEnd() {
-        if (isDragging) {
-            console.log("Drag End Fired"); // DEBUG
-            isDragging = false;
-            previewWindow.style.cursor = 'move';
-            previewWindow.style.removeProperty('user-select');
-            // Remove move/up listeners from the document
-            document.removeEventListener('mousemove', onDragging);
-            document.removeEventListener('mouseup', onDragEnd);
-        }
-    }
-
-    // Attach the initial mousedown listener to the header
-    previewHeader.addEventListener('mousedown', onDragStart);
-
-    // --- Window Controls --- //
-    minimizeBtn.addEventListener('click', () => {
-        const currentHeight = previewWindow.offsetHeight;
-        const headerHeight = previewHeader.offsetHeight;
-        if (currentHeight > headerHeight + 20) { // If not already minimized
-            originalHeight = previewWindow.style.height; // Store current height
-            previewWindow.style.height = `${headerHeight}px`;
-            previewWindow.style.minHeight = `${headerHeight}px`;
-            previewWindow.style.resize = 'none'; // Disable resize when minimized
-            minimizeBtn.textContent = '+'; // Change button symbol
-        } else { // Restore
-            previewWindow.style.height = originalHeight || '50vh';
-            previewWindow.style.minHeight = `300px`; // Restore min-height
-            previewWindow.style.resize = 'both'; // Re-enable resize
-            minimizeBtn.textContent = '_';
-        }
-    });
-
-    // Basic Maximize/Restore
-    maximizeBtn.addEventListener('click', () => {
-        if (!isMaximized) {
-            // Store current state before maximizing
-            originalSize = {
-                width: previewWindow.style.width || `${previewWindow.offsetWidth}px`,
-                height: previewWindow.style.height || `${previewWindow.offsetHeight}px`,
-                top: previewWindow.style.top || `${previewWindow.offsetTop}px`,
-                left: previewWindow.style.left || `${previewWindow.offsetLeft}px`
-            };
-            // Maximize (leave small padding)
-            previewWindow.style.top = '85px'; // Adjust padding from top (header height)
-            previewWindow.style.left = '10px';
-            previewWindow.style.width = 'calc(100% - 20px)';
-            previewWindow.style.height = 'calc(100vh - 95px)'; // Adjust padding from bottom
-            previewWindow.style.resize = 'none'; // Disable resize when maximized
-            isMaximized = true;
-             maximizeBtn.textContent = '❐'; // Change symbol
+    function renderSpreadPage(idx, label) {
+        const page = document.createElement('div');
+        page.className = 'spread-page';
+        if (idx < currentDesign.pages.length) {
+            const type = currentDesign.pages[idx].type;
+            page.innerHTML = `<span class="page-label">${capitalize(type)} Page (${idx + 1})</span>`;
+            page.style.background = currentDesign.pageColor;
+            // Simple style overlays
+            if (type === 'lined') {
+                page.style.backgroundImage = 'repeating-linear-gradient(to bottom, transparent, transparent 29px, #ccc 29px, #ccc 30px)';
+                page.style.backgroundSize = '100% 30px';
+            } else if (type === 'grid') {
+                page.style.backgroundImage = 'linear-gradient(#ccc 1px, transparent 1px), linear-gradient(to right, #ccc 1px, transparent 1px)';
+                page.style.backgroundSize = '20px 20px';
+            } else if (type === 'diary') {
+                page.style.backgroundImage = 'repeating-linear-gradient(to bottom, transparent, transparent 29px, #ccc 29px, #ccc 30px)';
+                page.style.backgroundSize = '100% 30px';
+                const diaryHeader = document.createElement('div');
+                diaryHeader.innerHTML = 'Date: ____________________';
+                diaryHeader.style.position = 'absolute';
+                diaryHeader.style.top = '28px';
+                diaryHeader.style.left = '10px';
+                diaryHeader.style.right = '10px';
+                diaryHeader.style.paddingBottom = '5px';
+                diaryHeader.style.borderBottom = '1px solid #ccc';
+                diaryHeader.style.fontSize = '0.9em';
+                diaryHeader.style.color = '#666';
+                page.appendChild(diaryHeader);
+            }
         } else {
-            // Restore
-            previewWindow.style.top = originalSize.top;
-            previewWindow.style.left = originalSize.left;
-            previewWindow.style.width = originalSize.width;
-            previewWindow.style.height = originalSize.height;
-            previewWindow.style.resize = 'both'; // Re-enable resize
-            isMaximized = false;
-             maximizeBtn.textContent = '□'; // Restore symbol
+            page.innerHTML = `<span class="page-label">Blank Page</span>`;
+            page.style.background = '#fff';
         }
+        return page;
+    }
+
+    // --- Price Calculation (Euros) --- //
+    function calculatePrice() {
+        let price = 0;
+        if (currentDesign.coverImage) price += 2;
+        const n = currentDesign.pages.length;
+        if (n === 48) price += 10;
+        else if (n === 55) price += 12;
+        else if (n === 96) price += 16;
+        else price += n * 0.20;
+        return price;
+    }
+    function updatePriceDisplay() {
+        const price = calculatePrice();
+        totalPriceSpan.textContent = `€${price.toFixed(2)}`;
+    }
+
+    submitBtn.addEventListener('click', () => {
+        // Save design to localStorage and redirect (simulate)
+        localStorage.setItem('pendingCustomDesign', JSON.stringify({
+            ...currentDesign,
+            size: currentDesign.pages.length,
+            price: calculatePrice()
+        }));
+        window.location.href = 'build.html';
     });
+
+    // --- Initial State --- //
+    enforceTotalPages();
+    updateCurrentDesignPages();
+    renderPageList();
+    renderNotebook();
+    updatePriceDisplay();
+    // Update price whenever relevant
+    [coverImageUpload, totalPagesInput, pageColorInput, addPageBtn].forEach(el => {
+        el.addEventListener('input', updatePriceDisplay);
+        el.addEventListener('change', updatePriceDisplay);
+    });
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 }
 
 function setupCartPage() {
@@ -785,7 +666,7 @@ function setupCartPage() {
                         hasCustom = true;
                         pageDetailsList += `<li><b>Custom Pages:</b> Style ${section.design.style}, Color ${section.design.color}`;
                         if(section.design.image) pageDetailsList += ", Image";
-                        if(section.design.inserts.length > 0) pageDetailsList += ", Inserts";
+                        if(section.design.inserts && section.design.inserts.length > 0) pageDetailsList += ", Inserts";
                         pageDetailsList += `</li>`;
                         coverDesc = `Cover: ${section.design.coverMaterial}`;
                         if(section.design.coverImage) coverDesc += ", Image";
@@ -816,7 +697,7 @@ function setupCartPage() {
                     ${detailsHTML}
                 </div>
                 <div class="cart-item-price">
-                    <span>£${item.totalPrice.toFixed(2)}</span>
+                    <span>€${item.totalPrice.toFixed(2)}</span>
                 </div>
                 <div class="cart-item-remove">
                     <button class="remove-item-btn" data-index="${index}">Remove</button>
@@ -1012,12 +893,12 @@ function calculatePrice(design, basePrice) {
     // Page image
     if (design.image) {
         price += CUSTOM_IMAGE_PRICE;
-        console.log(`Price Calc: Added £${CUSTOM_IMAGE_PRICE} for page image.`);
+        console.log(`Price Calc: Added €${CUSTOM_IMAGE_PRICE} for page image.`);
     }
     // Page inserts
     if (design.inserts && design.inserts.length > 0) {
         price += CUSTOM_INSERT_PRICE;
-        console.log(`Price Calc: Added £${CUSTOM_INSERT_PRICE} for page inserts.`);
+        console.log(`Price Calc: Added €${CUSTOM_INSERT_PRICE} for page inserts.`);
     }
 
     // --- Cover Costs --- //
@@ -1025,15 +906,15 @@ function calculatePrice(design, basePrice) {
     const materialCost = COVER_MATERIAL_PRICES[design.coverMaterial] || 0;
     if (materialCost > 0) {
         price += materialCost;
-        console.log(`Price Calc: Added £${materialCost} for ${design.coverMaterial} cover.`);
+        console.log(`Price Calc: Added €${materialCost} for ${design.coverMaterial} cover.`);
     }
     // Cover image
     if (design.coverImage) {
         price += COVER_IMAGE_PRICE;
-        console.log(`Price Calc: Added £${COVER_IMAGE_PRICE} for cover image.`);
+        console.log(`Price Calc: Added €${COVER_IMAGE_PRICE} for cover image.`);
     }
 
-    console.log(`Price Calc: Final Price: £${price.toFixed(2)}`);
+    console.log(`Price Calc: Final Price: €${price.toFixed(2)}`);
     return price;
 }
 
